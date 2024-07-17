@@ -1,14 +1,22 @@
-// routes/authRoutes.js
-const express = require('express');
+import express from 'express';
+import authController from '../controllers/Auth.js';
+
 const router = express.Router();
-const authController = require('../controllers/Auth');
+
+/**
+ * @swagger
+ * tags:
+ *   name: Authentication
+ *   description: Authentication related endpoints
+ */
 
 /**
  * @swagger
  * /api/auth/signup:
  *   post:
+ *     tags: [Authentication]
  *     summary: Register a new user
- *     description: Can register a new user with a username, password, and role.
+ *     description: Can register a new user with a name, email, password, phone_number, address, and role.
  *     requestBody:
  *       required: true
  *       content:
@@ -16,13 +24,15 @@ const authController = require('../controllers/Auth');
  *           schema:
  *             type: object
  *             properties:
- *               username:
- *                 type: string
- *               password:
+ *               name:
  *                 type: string
  *               email:
  *                 type: string
- *               name:
+ *               password:
+ *                 type: string
+ *               phone_number:
+ *                 type: string
+ *               address:
  *                 type: string
  *               role:
  *                 type: string
@@ -33,15 +43,15 @@ const authController = require('../controllers/Auth');
  *       400:
  *         description: Error message
  */
-
 router.post('/signup', authController.registerUser);
 
 /**
  * @swagger
  * /api/auth/login:
  *   post:
+ *     tags: [Authentication]
  *     summary: Login a user
- *     description: Log in with username and password.
+ *     description: Log in with email and password.
  *     requestBody:
  *       required: true
  *       content:
@@ -49,7 +59,7 @@ router.post('/signup', authController.registerUser);
  *           schema:
  *             type: object
  *             properties:
- *               username:
+ *               email:
  *                 type: string
  *               password:
  *                 type: string
@@ -57,8 +67,8 @@ router.post('/signup', authController.registerUser);
  *       200:
  *         description: User logged in successfully
  *       400:
- *         description: Invalid username or password
+ *         description: Invalid email or password
  */
 router.post('/login', authController.loginUser);
 
-module.exports = router;
+export default router;

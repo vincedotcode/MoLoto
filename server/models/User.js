@@ -1,18 +1,10 @@
-// models/User.js
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+import mongoose from 'mongoose';
 
-const userSchema = new Schema({
-    username: {
+const userSchema = new mongoose.Schema({
+    name: {
         type: String,
         required: true,
-        unique: true,
-        trim: true, 
-        lowercase: true, 
-    },
-    password: {
-        type: String,
-        required: true,
+        trim: true,
     },
     email: {
         type: String,
@@ -22,22 +14,26 @@ const userSchema = new Schema({
         trim: true,
         match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address'],
     },
-    role: {
+    password: {
         type: String,
-        enum: ['buyer', 'seller', 'admin'],
-        default: 'buyer',
+        required: true,
     },
-    name: {
+    phone_number: {
         type: String,
         required: true,
         trim: true,
     },
-    contactNumber: {
+    address: {
         type: String,
-        required: false,
+        required: true,
         trim: true,
-        match: [/^\+?[1-9]\d{1,14}$/, 'Please fill a valid contact number'], // E.164 format
+    },
+    role: {
+        type: String,
+        enum: ['buyer', 'seller', 'admin'],
+        default: 'buyer',
+        required: true,
     }
 }, { timestamps: true });
 
-module.exports = mongoose.model('User', userSchema);
+export default mongoose.model('User', userSchema);

@@ -1,12 +1,17 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const swaggerUi = require('swagger-ui-express');
-const swaggerJsdoc = require('swagger-jsdoc');
-const authRoutes = require('./routes/Auth');
-const carRoutes = require('./routes/Car');
-const aiRoutes = require('./routes/Ai')
-const config = require('./config');
-const authenticateJWT = require('./middlewares/authenticateJWT');
+import express from 'express';
+import mongoose from 'mongoose';
+import swaggerUi from 'swagger-ui-express';
+import swaggerJsdoc from 'swagger-jsdoc';
+import cors from 'cors'; 
+import authRoutes from './routes/Auth.js';
+import carRoutes from './routes/Car.js';
+import appointmentRoutes from './routes/Appointment.js';
+import imageRoutes from './routes/Image.js';
+import wishlistRoutes from './routes/Wishlist.js';
+import commentRoutes from './routes/Comments.js';
+import reviewRoutes from './routes/Review.js';
+import config from './config/index.js';
+import swaggerSchemas from './swagger/schema.js';
 
 const app = express();
 
@@ -23,34 +28,47 @@ const swaggerOptions = {
             description: 'API Documentation for the Car Marketplace application',
         },
         components: {
-            securitySchemes: {
-                bearerAuth: {
-                    type: 'http',
-                    scheme: 'bearer',
-                    bearerFormat: 'JWT',
+            schemas: {
+                Car: swaggerSchemas.carSchema,
+                Wishlist: swaggerSchemas.wishlistSchema,
+                Comment: {
+                    type: 'object',
+                    properties: {
+                        user_id: { type: 'string' },
+                        car_id: { type: 'string' },
+                        comment: { type: 'string' },
+                        is_public: { type: 'boolean' },
+                    },
+                },
+                Review: {
+                    type: 'object',
+                    properties: {
+                        user_id: { type: 'string' },
+                        car_id: { type: 'string' },
+                        rating: { type: 'number' },
+                        review: { type: 'string' },
+                    },
                 },
             },
         },
-        security: [{
-            bearerAuth: [],
-        }],
     },
     apis: ['./routes/*.js'],
 };
+
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
+app.use(cors());  // Enable CORS for all routes
+
 app.use(express.json());
-// Apply globally with exceptions
-app.use((req, res, next) => {
-    if (req.path.startsWith('/api-docs') || req.path.startsWith('/api/auth')) {
-        return next();
-    }
-    authenticateJWT(req, res, next);
-});
+
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/auth', authRoutes);
 app.use('/api/cars', carRoutes);
-app.use('/api/ai', aiRoutes)
+app.use('/api/appointments', appointmentRoutes);
+app.use('/api/image', imageRoutes);
+app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/comments', commentRoutes);
+app.use('/api/reviews', reviewRoutes);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
