@@ -2,6 +2,16 @@ import Wishlist from '../models/Wishlist.js';
 
 // Add to wishlist
 const addToWishlist = async (wishlistData) => {
+    // Check if the car is already in the wishlist for the user
+    const existingWishlistItem = await Wishlist.findOne({
+        user_id: wishlistData.user_id,
+        car_id: wishlistData.car_id,
+    });
+
+    if (existingWishlistItem) {
+        throw new Error('Car is already in the wishlist');
+    }
+
     const wishlistItem = new Wishlist(wishlistData);
     await wishlistItem.save();
     return wishlistItem;
@@ -25,5 +35,5 @@ const removeFromWishlist = async (wishlistId) => {
 export default {
     addToWishlist,
     getWishlistsByUserId,
-    removeFromWishlist
+    removeFromWishlist,
 };

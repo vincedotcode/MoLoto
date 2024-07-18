@@ -25,6 +25,9 @@ export const uploadImage = async (imageFile: { uri: string; name: string; type: 
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
+            transformRequest: (data, headers) => {
+                return formData; // Workaround to ensure form data is correctly sent
+            },
         });
 
         if (response.data && response.data.imageUrl) {

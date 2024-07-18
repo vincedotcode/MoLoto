@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, StyleSheet, View, Alert } from 'react-native';
+import { ScrollView, StyleSheet, View, Alert, TextInput, Text, TouchableOpacity } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
-import ImageUploader from '@/components/ImageUploader';
-import ImageSlider from '@/components/ImageSlider';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/Card';
 import { addCar } from '@/services/car';
 import { useAuth } from "@/hooks/useAuth";
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 interface AddCarData {
   seller_id: string;
@@ -59,6 +58,7 @@ const AddCar: React.FC<AddCarProps> = ({ onAddCarSuccess }) => {
     car_type: 'sedan',
   });
   const [loading, setLoading] = useState(false);
+  const [imageUrl, setImageUrl] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -91,8 +91,18 @@ const AddCar: React.FC<AddCarProps> = ({ onAddCarSuccess }) => {
     }
   };
 
-  const handleImagesChange = (imageUrls: string[]) => {
-    setCar({ ...car, image_urls: imageUrls });
+  const handleImagesChange = () => {
+    if (imageUrl && car.image_urls.length < 5) {
+      setCar({ ...car, image_urls: [...car.image_urls, imageUrl] });
+      setImageUrl('');
+    } else {
+      Alert.alert('Error', 'You can only add up to 5 images');
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    const updatedImages = car.image_urls.filter((_, i) => i !== index);
+    setCar({ ...car, image_urls: updatedImages });
   };
 
   return (
@@ -207,8 +217,25 @@ const AddCar: React.FC<AddCarProps> = ({ onAddCarSuccess }) => {
               value={car.car_type}
             />
           </View>
-          <ImageUploader onImagesChange={handleImagesChange} />
-          {car.image_urls.length > 0 && <ImageSlider images={car.image_urls} />}
+
+          <View style={styles.imageInputContainer}>
+            <TextInput
+              style={styles.imageInput}
+              placeholder="Image URL"
+              value={imageUrl}
+              onChangeText={setImageUrl}
+            />
+            <Button onPress={handleImagesChange}>Add Image</Button>
+          </View>
+          {car.image_urls.map((url, index) => (
+            <View key={index} style={styles.imageUrlContainer}>
+              <Text style={styles.imageUrl}>{url}</Text>
+              <TouchableOpacity onPress={() => handleRemoveImage(index)}>
+                <AntDesign name="delete" size={24} color="black" />
+              </TouchableOpacity>
+            </View>
+          ))}
+
           <Button onPress={handleAddCar} disabled={loading}>
             {loading ? 'Adding...' : 'Add Car'}
           </Button>
@@ -229,6 +256,29 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 10,
     backgroundColor: '#fff',
+  },
+  imageInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  imageInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ABABAB',
+    borderRadius: 8,
+    padding: 10,
+    backgroundColor: '#fff',
+    marginRight: 10,
+  },
+  imageUrlContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 5,
+  },
+  imageUrl: {
+    color: '#000',
   },
 });
 

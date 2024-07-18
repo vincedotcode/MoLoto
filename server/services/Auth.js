@@ -49,8 +49,15 @@ const login = async (email, password) => {
 
     return { user, token };
 };
-
+const getUserById = async (userId) => {
+    const user = await User.findById(userId);
+    if (!user) {
+        throw new Error('User not found');
+    }
+    return user;
+};
 export default {
     register,
     login,
+    getUserById,
 };

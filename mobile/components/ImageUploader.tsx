@@ -25,7 +25,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesChange }) => {
       try {
         const imageFile = {
           uri,
-          name: uri.split('/').pop(),
+          name: uri.split('/').pop() || 'default_name.jpg',
           type: `image/${uri.split('.').pop()}`,
         };
         const uploadedImageUrl: UploadImageResponse = await uploadImage(imageFile as any);

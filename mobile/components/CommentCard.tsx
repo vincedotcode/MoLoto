@@ -3,6 +3,8 @@ import { View, StyleSheet } from "react-native";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/Card";
 import { Text } from "@/components/Text";
 import Row from "@/components/Row";
+import Badge from "@/components/Badge";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Comment {
   _id: string;
@@ -20,14 +22,23 @@ interface Comment {
 
 interface CommentCardProps {
   comment: Comment;
+  carSellerId: string;
 }
 
-const CommentCard: React.FC<CommentCardProps> = ({ comment }) => {
+const CommentCard: React.FC<CommentCardProps> = ({ comment, carSellerId }) => {
+  const { user } = useAuth();
+
+  const canViewPrivateComment = !comment.is_public && (user?._id === comment.user_id._id || user?._id === carSellerId);
+
   return (
     <Card style={styles.card}>
       <CardHeader>
         <Row justifyBetween alignCenter>
           <CardTitle style={styles.title}>{comment.user_id.name}</CardTitle>
+          <>
+          {!comment.is_public && canViewPrivateComment && <Badge variant="destructive">Private Comment</Badge>}
+
+          </>
         </Row>
       </CardHeader>
       <CardContent>

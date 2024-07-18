@@ -40,7 +40,15 @@ router.post('/', wishlistController.addToWishlist);
  * /api/wishlist/user/{userId}:
  *   get:
  *     tags: [Wishlist]
- *     summary: Get
+ *     summary: Get wishlist items by user ID
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: User ID
+ *     responses:
  *       200:
  *         description: A list of wishlist items
  *         content:

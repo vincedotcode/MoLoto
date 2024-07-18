@@ -25,9 +25,8 @@ const deleteCar = async (carId) => {
     return car;
 };
 
-
 // Get all cars
-const getAllCars = async () => {
+const  getAllCars = async () => {
     const cars = await Car.find().populate('seller_id', 'name email phone_number address');
     return cars;
 };
@@ -53,7 +52,7 @@ const getCarsByBuyerId = async (buyerId) => {
     return cars;
 };
 
-export default {
+export {
     addCar,
     updateCar,
     deleteCar,

@@ -16,8 +16,13 @@ import { Ionicons } from "@expo/vector-icons";
 import DatePicker from "@/components/DatePicker";
 import Input from "@/components/Input";
 import SuccessModal from "@/components/SuccessModal";
+import FailureModal from "@/components/FailureModal";
 import Checkbox from "@/components/Checkbox";
-import {addAppointment as bookAppointment} from "@/services/appointment";
+import { addAppointment as bookAppointment } from "@/services/appointment";
+import { addToWishlist } from "@/services/wishlist";
+import { createReview, getReviewsByCarId, deleteReview, Review } from "@/services/review";
+import ReviewCard from "@/components/ReviewCard";
+
 const CarDetail: React.FC = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
@@ -34,6 +39,15 @@ const CarDetail: React.FC = () => {
   const [appointmentDate, setAppointmentDate] = useState<Date>(new Date());
   const [description, setDescription] = useState<string>("");
   const [isAppointmentLoading, setIsAppointmentLoading] = useState<boolean>(false);
+
+  const [isAddReviewModalVisible, setIsAddReviewModalVisible] = useState<boolean>(false);
+  const [review, setReview] = useState<string>("");
+  const [rating, setRating] = useState<number>(0);
+  const [isReviewLoading, setIsReviewLoading] = useState<boolean>(false);
+
+  const [isReviewModalVisible, setIsReviewModalVisible] = useState<boolean>(false);
+  const [reviews, setReviews] = useState<Review[]>([]);
+
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState<boolean>(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string>("");
@@ -100,6 +114,57 @@ const CarDetail: React.FC = () => {
       setIsErrorModalVisible(true);
     } finally {
       setIsAppointmentLoading(false);
+    }
+  };
+
+  const handleAddToWishlist = async () => {
+    setLoading(true);
+    try {
+      await addToWishlist(user?._id ?? "", car?._id ?? "");
+      setSuccessMessage("Car added to wishlist successfully!");
+      setIsSuccessModalVisible(true);
+    } catch (error) {
+      setErrorMessage("Car is already in the wishlist");
+      setIsErrorModalVisible(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddReview = async () => {
+    setIsReviewLoading(true);
+    try {
+      await createReview(user?._id ?? "", car?._id ?? "", rating, review);
+      setIsAddReviewModalVisible(false);
+      setSuccessMessage("Review added successfully!");
+      setIsSuccessModalVisible(true);
+    } catch (error) {
+      setErrorMessage("Failed to add review. Please try again.");
+      setIsErrorModalVisible(true);
+    } finally {
+      setIsReviewLoading(false);
+    }
+  };
+
+  const fetchReviews = async () => {
+    try {
+      const reviewsData = await getReviewsByCarId(car?._id ?? "");
+      setReviews(reviewsData);
+      setIsReviewModalVisible(true);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDeleteReview = async (reviewId: string) => {
+    try {
+      await deleteReview(reviewId);
+      setReviews(reviews.filter((review) => review._id !== reviewId));
+      setSuccessMessage("Review deleted successfully!");
+      setIsSuccessModalVisible(true);
+    } catch (error) {
+      setErrorMessage("Failed to delete review. Please try again.");
+      setIsErrorModalVisible(true);
     }
   };
 
@@ -178,6 +243,15 @@ const CarDetail: React.FC = () => {
           </CardContent>
           <CardFooter>
             <Button variant="default" onPress={() => setIsModalVisible(true)}>Book Appointment</Button>
+            <Button variant="default" onPress={handleAddToWishlist} disabled={loading} style={styles.addButton}>
+              {loading ? <ActivityIndicator size="small" color="#fff" /> : "Add to Wishlist"}
+            </Button>
+            <Button variant="default" onPress={() => setIsAddReviewModalVisible(true)} style={styles.addButton}>
+              Add Review
+            </Button>
+            <Button variant="default" onPress={fetchReviews} style={styles.addButton}>
+              View Reviews
+            </Button>
           </CardFooter>
         </Card>
         <Card>
@@ -199,7 +273,7 @@ const CarDetail: React.FC = () => {
             <CardTitle>Comments</CardTitle>
           </CardHeader>
           <CardContent>
-            <CommentList carId={car._id} newComment={newComment} />
+            <CommentList carId={car._id} newComment={newComment} carSellerId={car.seller_id._id} />
             <View style={styles.addCommentContainer}>
               <TextInput
                 value={comment}
@@ -239,6 +313,61 @@ const CarDetail: React.FC = () => {
         </View>
       </Modal>
 
+      {/* Add Review Modal */}
+      <Modal visible={isAddReviewModalVisible} animationType="slide" transparent={true} onRequestClose={() => setIsAddReviewModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Add Review</Text>
+            <Input
+              label="Review"
+              value={review}
+              onChangeText={setReview}
+              placeholder="Enter review"
+            />
+            <View style={styles.ratingContainer}>
+              <Text>Rating:</Text>
+              <View style={styles.ratingButtons}>
+                <Button onPress={() => setRating(Math.max(0, rating - 1))} disabled={rating === 0}>
+                  -
+                </Button>
+                <Text style={styles.rating}>{rating}</Text>
+                <Button onPress={() => setRating(Math.min(5, rating + 1))} disabled={rating === 5}>
+                  +
+                </Button>
+              </View>
+            </View>
+            <Button variant="default" onPress={handleAddReview} disabled={isReviewLoading}>
+              {isReviewLoading ? <ActivityIndicator size="small" color="#fff" /> : "Submit Review"}
+            </Button>
+            <Button variant="default" onPress={() => setIsAddReviewModalVisible(false)} style={styles.closeButton}>
+              Close
+            </Button>
+          </View>
+        </View>
+      </Modal>
+
+      {/* View Reviews Modal */}
+      <Modal visible={isReviewModalVisible} animationType="slide" transparent={true} onRequestClose={() => setIsReviewModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContentFixedHeight}>
+            <Text style={styles.modalTitle}>Reviews</Text>
+            <ScrollView style={styles.reviewScrollView}>
+              {reviews.map((review) => (
+                <ReviewCard
+                  key={review._id}
+                  review={review}
+                  onDelete={() => handleDeleteReview(review._id)}
+                  showDeleteButton={review.user_id._id === user?._id}
+                />
+              ))}
+            </ScrollView>
+            <Button variant="default" onPress={() => setIsReviewModalVisible(false)} style={styles.closeButton}>
+              Close
+            </Button>
+          </View>
+        </View>
+      </Modal>
+
       {/* Success Modal */}
       <SuccessModal
         visible={isSuccessModalVisible}
@@ -248,7 +377,7 @@ const CarDetail: React.FC = () => {
       />
 
       {/* Error Modal */}
-      <SuccessModal
+      <FailureModal
         visible={isErrorModalVisible}
         onClose={() => setIsErrorModalVisible(false)}
         title="Error"
@@ -320,14 +449,37 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center"
   },
+  modalContentFixedHeight: {
+    width: 300,
+    height: 400,
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+    alignItems: "center"
+  },
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
     marginVertical: 10
   },
-  input: {
-    width: "100%",
+  ratingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: 10
+  },
+  ratingButtons: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 10
+  },
+  rating: {
+    marginHorizontal: 10,
+    fontSize: 18,
+    fontWeight: "bold"
+  },
+  reviewScrollView: {
+    flex: 1,
+    width: "100%"
   },
   closeButton: {
     marginTop: 10,

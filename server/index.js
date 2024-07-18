@@ -2,7 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
-import cors from 'cors'; 
+import cors from 'cors';
 import authRoutes from './routes/Auth.js';
 import carRoutes from './routes/Car.js';
 import appointmentRoutes from './routes/Appointment.js';
@@ -10,6 +10,7 @@ import imageRoutes from './routes/Image.js';
 import wishlistRoutes from './routes/Wishlist.js';
 import commentRoutes from './routes/Comments.js';
 import reviewRoutes from './routes/Review.js';
+import carAiRoutes from './routes/carAiRoutes.js'; // Import car AI routes
 import config from './config/index.js';
 import swaggerSchemas from './swagger/schema.js';
 
@@ -57,7 +58,7 @@ const swaggerOptions = {
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
-app.use(cors());  // Enable CORS for all routes
+app.use(cors()); // Enable CORS for all routes
 
 app.use(express.json());
 
@@ -69,6 +70,7 @@ app.use('/api/image', imageRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/car-ai', carAiRoutes); // Add car AI routes
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

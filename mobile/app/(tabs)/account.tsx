@@ -58,7 +58,7 @@ const Account = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.cardContainer}
-            onPress={() => console.log("My Wishlists")}
+            onPress={() => router.push("/wishlist")} // Navigate to the appointments page
           >
             <Card style={styles.widgetCard}>
               <CardContent style={styles.cardContent}>

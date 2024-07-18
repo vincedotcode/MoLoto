@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ActivityIndicator } from "react-native";
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/Card";
 import { Text } from "@/components/Text";
 import { getCommentsByCarId, Comment } from "@/services/comment";
+import CommentCard from "@/components/CommentCard";
 
 interface CommentListProps {
   carId: string;
   newComment: boolean; // Add newComment prop to trigger re-fetch
+  carSellerId: string; // Add the car seller ID as a prop
 }
 
-const CommentList: React.FC<CommentListProps> = ({ carId, newComment }) => {
+const CommentList: React.FC<CommentListProps> = ({ carId, newComment, carSellerId }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +19,7 @@ const CommentList: React.FC<CommentListProps> = ({ carId, newComment }) => {
     const fetchComments = async () => {
       try {
         const commentsData = await getCommentsByCarId(carId);
-        setComments(commentsData.filter((comment) => comment.is_public)); // Filter public comments
+        setComments(commentsData);
       } catch (error) {
         if (error instanceof Error) {
           const err = JSON.parse(error.message);
@@ -32,7 +33,7 @@ const CommentList: React.FC<CommentListProps> = ({ carId, newComment }) => {
     };
 
     fetchComments();
-  }, [carId, newComment]); // Re-fetch comments when newComment changes
+  }, [carId, newComment]); 
 
   if (loading) {
     return (
@@ -61,14 +62,7 @@ const CommentList: React.FC<CommentListProps> = ({ carId, newComment }) => {
   return (
     <View>
       {comments.map((comment) => (
-        <Card key={comment._id} style={styles.commentCard}>
-          <CardHeader>
-            <CardTitle>{comment.user_id.name}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Text>{comment.comment}</Text>
-          </CardContent>
-        </Card>
+        <CommentCard key={comment._id} comment={comment} carSellerId={carSellerId} />
       ))}
     </View>
   );
@@ -78,9 +72,6 @@ const styles = StyleSheet.create({
   centered: {
     justifyContent: "center",
     alignItems: "center"
-  },
-  commentCard: {
-    marginBottom: 10
   }
 });
 
