@@ -70,7 +70,7 @@ app.use('/api/image', imageRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/reviews', reviewRoutes);
-app.use('/api/car-ai', carAiRoutes); // Add car AI routes
+app.use('/api/car-ai', carAiRoutes); // Add car AI routes tesst
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
