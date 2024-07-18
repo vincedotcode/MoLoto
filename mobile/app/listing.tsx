@@ -19,8 +19,24 @@ const Home: React.FC = () => {
   const [modalVisible, setModalVisible] = useState<boolean>(false); // State to control modal visibility
 
   const { user } = useAuth();
-  const categories = ["All", "Sedan", "SUV", "Truck", "Coupe"];
-
+  const categories = [
+    "All", 
+    "Sedan", 
+    "Hatchback", 
+    "SUV", 
+    "Coupé", 
+    "Convertible", 
+    "Wagon", 
+    "Pickup", 
+    "Minivan", 
+    "Sports Car", 
+    "Electric", 
+    "Hybrid", 
+    "Luxury", 
+    "Off-Road", 
+    "Other"
+  ];
+  
   useEffect(() => {
     const fetchCars = async () => {
       try {

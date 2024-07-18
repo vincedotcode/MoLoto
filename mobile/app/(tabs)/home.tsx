@@ -12,9 +12,24 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
-
-  const categories = ["All", "Sedan", "SUV", "Truck", "Coupe"]; // Example categories
-
+  const categories = [
+    "All", 
+    "Sedan", 
+    "Hatchback", 
+    "SUV", 
+    "Coupé", 
+    "Convertible", 
+    "Wagon", 
+    "Pickup", 
+    "Minivan", 
+    "Sports Car", 
+    "Electric", 
+    "Hybrid", 
+    "Luxury", 
+    "Off-Road", 
+    "Other"
+  ];
+  
   useEffect(() => {
     const fetchCars = async () => {
       try {

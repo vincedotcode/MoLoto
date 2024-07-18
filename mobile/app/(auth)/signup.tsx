@@ -8,6 +8,7 @@ import { Text } from "@/components/Text"; // Adjust the import path as needed
 import { register } from "@/services/auth"; // Import the register service
 import SuccessModal from "@/components/SuccessModal";
 import FailureModal from "@/components/FailureModal";
+import { Link } from 'expo-router'; // Import the Link component
 
 const SignUp: React.FC = () => {
   const [name, setName] = useState("");
@@ -90,6 +91,11 @@ const SignUp: React.FC = () => {
             </Button>
           </CardFooter>
         </Card>
+        <View style={styles.loginLinkContainer}>
+          <Text style={styles.loginText}>
+            Already have an account? <Link href="/signin" style={styles.loginLink}>Log In</Link>
+          </Text>
+        </View>
       </ScrollView>
       <SuccessModal
         visible={success}
@@ -117,6 +123,18 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: 16,
     color: "#333"
+  },
+  loginLinkContainer: {
+    marginTop: 20,
+    alignItems: "center"
+  },
+  loginText: {
+    fontSize: 16,
+    color: "#333"
+  },
+  loginLink: {
+    color: "#007BFF",
+    textDecorationLine: "underline"
   }
 });
 
