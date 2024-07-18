@@ -71,4 +71,26 @@ router.post('/signup', authController.registerUser);
  */
 router.post('/login', authController.loginUser);
 
+/**
+ * @swagger
+ * /api/auth/user/{id}:
+ *   get:
+ *     tags: [Authentication]
+ *     summary: Get user by ID
+ *     description: Get user information by user ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User fetched successfully
+ *       400:
+ *         description: Error message
+ */
+router.get('/user/:id', authController.getUserById);
+
 export default router;

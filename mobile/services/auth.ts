@@ -106,3 +106,32 @@ export const login = async (credentials: LoginCredentials): Promise<LoginRespons
     }
   }
 };
+
+export const getUserById = async (userId: string): Promise<UserData> => {
+  const url = `${process.env.EXPO_PUBLIC_API_URL}/auth/user/${userId}`;
+
+  try {
+    const response = await axios.get<{ user: UserData }>(url);
+    return response.data.user;
+  } catch (error) {
+    console.log(error);
+    const axiosError = error as AxiosError<ApiResponse>;
+    if (axiosError.response) {
+      throw new Error(
+        JSON.stringify({
+          statusCode: axiosError.response.status,
+          message: axiosError.response.data.message || ["An unexpected error occurred"],
+          error: axiosError.response.data.error || "Bad Request"
+        })
+      );
+    } else {
+      throw new Error(
+        JSON.stringify({
+          statusCode: 500,
+          message: ["Network Error or Internal Server Error"],
+          error: "Server Error"
+        })
+      );
+    }
+  }
+};

@@ -5,7 +5,7 @@ const carAiController = async (req, res) => {
     let context = [
       {
         role: 'system',
-        content: 'You are a car sales assistant helping users find the best cars, contact sellers.'
+        content: 'You are a car sales assistant helping users find the best cars, contact sellers. Return the currencies in Mauritian Rupees (Rs)'
       }
     ];
 

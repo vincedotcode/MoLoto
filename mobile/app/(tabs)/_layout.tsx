@@ -11,7 +11,7 @@ const TabsLayout = () => {
 
   const handleLogout = async () => {
     await logout();
-    router.replace("/"); 
+    router.replace("/");
   };
 
   return (
@@ -36,10 +36,10 @@ const TabsLayout = () => {
           title: "Account",
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="user-circle" color={color} />,
           headerRight: () => (
-            <View>
- <Button onPress={handleLogout} title="Logout" color="#000" />
+            <View style={styles.buttonStyle}>
+              <Button onPress={handleLogout} title="Logout" color="#000" />
             </View>
-           
+
           ),
         }}
       />
@@ -54,6 +54,10 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
     alignItems: "center",
+  },
+
+  buttonStyle: {
+   margin: 10,
   },
 });
 

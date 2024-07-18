@@ -13,9 +13,9 @@ const Account = () => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>   
         <View style={styles.profileContainer}>
-          <TouchableOpacity style={styles.touchableCard} onPress={() => console.log("My Profile")}>
+          <TouchableOpacity style={styles.touchableCard} onPress={() =>  router.push("/profile")}>
             <Card style={styles.profileCard}>
               <CardContent style={styles.cardContent}>
                 <Ionicons name="person-outline" size={24} color="#fff" />
@@ -72,7 +72,7 @@ const Account = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.cardContainer}
-            onPress={() => console.log("My Cars")}
+            onPress={() => router.push("/MyCar")} // Navigate to the listings page
           >
             <Card style={styles.widgetCard}>
               <CardContent style={styles.cardContent}>

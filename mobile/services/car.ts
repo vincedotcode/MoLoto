@@ -169,3 +169,31 @@ export const getCarsBySellerId = async (sellerId: string): Promise<Car[]> => {
     }
   }
 };
+
+
+export const getCarsByBuyerId = async (userId: string): Promise<Car[]> => {
+  try {
+    const response = await axios.get<Car[]>(`${API_URL}/cars/buyer/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    const axiosError = error as AxiosError<ApiResponse>;
+    if (axiosError.response) {
+      throw new Error(
+        JSON.stringify({
+          statusCode: axiosError.response.status,
+          message: axiosError.response.data.message || ["An unexpected error occurred"],
+          error: axiosError.response.data.error || "Bad Request"
+        })
+      );
+    } else {
+      throw new Error(
+        JSON.stringify({
+          statusCode: 500,
+          message: ["Network Error or Internal Server Error"],
+          error: "Server Error"
+        })
+      );
+    }
+  }
+};

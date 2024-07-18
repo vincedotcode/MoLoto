@@ -3,6 +3,7 @@ import { View, StyleSheet, ActivityIndicator } from "react-native";
 import { Text } from "@/components/Text";
 import { getCommentsByCarId, Comment } from "@/services/comment";
 import CommentCard from "@/components/CommentCard";
+import { useAuth } from "@/hooks/useAuth";
 
 interface CommentListProps {
   carId: string;
@@ -14,12 +15,19 @@ const CommentList: React.FC<CommentListProps> = ({ carId, newComment, carSellerI
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchComments = async () => {
       try {
         const commentsData = await getCommentsByCarId(carId);
-        setComments(commentsData);
+        const filteredComments = commentsData.filter(
+          (comment) => 
+            comment.is_public || 
+            comment.user_id._id.toString() === user?._id.toString() || 
+            user?._id.toString() === carSellerId.toString()
+        );
+        setComments(filteredComments);
       } catch (error) {
         if (error instanceof Error) {
           const err = JSON.parse(error.message);
@@ -33,7 +41,7 @@ const CommentList: React.FC<CommentListProps> = ({ carId, newComment, carSellerI
     };
 
     fetchComments();
-  }, [carId, newComment]); 
+  }, [carId, newComment, user?._id, carSellerId]);
 
   if (loading) {
     return (

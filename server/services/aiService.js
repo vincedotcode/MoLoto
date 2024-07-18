@@ -9,7 +9,7 @@ async function getCarSalesAI(context, userId) {
   const initialContext = [
     {
       role: 'system',
-      content: 'You are a car sales assistant helping users find the best cars, contact sellers. User ID will always be provided as user_id.'
+      content: 'You are a car sales assistant helping users find the best cars, contact sellers. User ID will always be provided as user_id. Return the currencies in Mauritian Rupees (Rs)'
     },
     {
       role: 'user',

@@ -19,7 +19,17 @@ const loginUser = async (req, res) => {
     }
 };
 
+const getUserById = async (req, res) => {
+    try {
+        const user = await authService.getUserById(req.params.id);
+        res.json({ user });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
 export default {
     registerUser,
     loginUser,
+    getUserById,
 };
