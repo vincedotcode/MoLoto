@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Button, Image, StyleSheet, ActivityIndicator, Alert, FlatList } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { uploadImage } from '@/services/image';
+import { uploadImage, UploadImageResponse } from '@/services/image';
 import { Ionicons } from '@expo/vector-icons';
 
 interface ImageUploaderProps {
@@ -23,9 +23,14 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesChange }) => {
       const { uri } = result.assets[0];
       setLoading(true);
       try {
-        const uploadedImageUrl = await uploadImage(uri);
+        const imageFile = {
+          uri,
+          name: uri.split('/').pop(),
+          type: `image/${uri.split('.').pop()}`,
+        };
+        const uploadedImageUrl: UploadImageResponse = await uploadImage(imageFile as any);
         setImages((prevImages) => {
-          const updatedImages = [...prevImages, uploadedImageUrl];
+          const updatedImages = [...prevImages, uploadedImageUrl.imageUrl];
           onImagesChange(updatedImages);
           return updatedImages;
         });

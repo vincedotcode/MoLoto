@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, ActivityIndicator, ScrollView, TextInput } from "react-native";
+import { View, StyleSheet, ActivityIndicator, ScrollView, TextInput, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getCarById, Car } from "@/services/car";
 import { Text } from "@/components/Text";
@@ -12,9 +12,12 @@ import CommentList from "@/components/CommentList";
 import { useLocalSearchParams, useRouter, Link, Stack } from "expo-router";
 import { useAuth } from "@/hooks/useAuth";
 import { addComment } from "@/services/comment";
-import Checkbox from "@/components/Checkbox";
 import { Ionicons } from "@expo/vector-icons";
-
+import DatePicker from "@/components/DatePicker";
+import Input from "@/components/Input";
+import SuccessModal from "@/components/SuccessModal";
+import Checkbox from "@/components/Checkbox";
+import {addAppointment as bookAppointment} from "@/services/appointment";
 const CarDetail: React.FC = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
@@ -26,6 +29,15 @@ const CarDetail: React.FC = () => {
   const [commentLoading, setCommentLoading] = useState<boolean>(false);
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [newComment, setNewComment] = useState<boolean>(false);
+
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [appointmentDate, setAppointmentDate] = useState<Date>(new Date());
+  const [description, setDescription] = useState<string>("");
+  const [isAppointmentLoading, setIsAppointmentLoading] = useState<boolean>(false);
+  const [isSuccessModalVisible, setIsSuccessModalVisible] = useState<boolean>(false);
+  const [isErrorModalVisible, setIsErrorModalVisible] = useState<boolean>(false);
+  const [successMessage, setSuccessMessage] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   useEffect(() => {
     const fetchCar = async () => {
@@ -65,6 +77,29 @@ const CarDetail: React.FC = () => {
       console.error(error);
     } finally {
       setCommentLoading(false);
+    }
+  };
+
+  const handleBookAppointment = async () => {
+    setIsAppointmentLoading(true);
+    try {
+      // Make the API call to book the appointment here
+      await bookAppointment({
+        buyer_id: user?._id ?? "",
+        seller_id: car?.seller_id._id ?? "",
+        car_id: car?._id ?? "",
+        appointment_date: appointmentDate,
+        description,
+        status: "scheduled"
+      });
+      setIsModalVisible(false);
+      setSuccessMessage("Appointment booked successfully!");
+      setIsSuccessModalVisible(true);
+    } catch (error) {
+      setErrorMessage("Failed to book appointment. Please try again.");
+      setIsErrorModalVisible(true);
+    } finally {
+      setIsAppointmentLoading(false);
     }
   };
 
@@ -142,7 +177,7 @@ const CarDetail: React.FC = () => {
             </Row>
           </CardContent>
           <CardFooter>
-            <Button variant="default">Book Appointment</Button>
+            <Button variant="default" onPress={() => setIsModalVisible(true)}>Book Appointment</Button>
           </CardFooter>
         </Card>
         <Card>
@@ -181,6 +216,44 @@ const CarDetail: React.FC = () => {
           </CardContent>
         </Card>
       </ScrollView>
+
+      {/* Book Appointment Modal */}
+      <Modal visible={isModalVisible} animationType="slide" transparent={true} onRequestClose={() => setIsModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Book Appointment</Text>
+            <Input
+              label="Description"
+              value={description}
+              onChangeText={setDescription}
+              placeholder="Enter description"
+            />
+            <DatePicker date={appointmentDate} onDateChange={setAppointmentDate} />
+            <Button variant="default" onPress={handleBookAppointment} disabled={isAppointmentLoading}>
+              {isAppointmentLoading ? <ActivityIndicator size="small" color="#fff" /> : "Book Appointment"}
+            </Button>
+            <Button variant="default" onPress={() => setIsModalVisible(false)} style={styles.closeButton}>
+              Close
+            </Button>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Success Modal */}
+      <SuccessModal
+        visible={isSuccessModalVisible}
+        onClose={() => setIsSuccessModalVisible(false)}
+        title="Success"
+        message={successMessage}
+      />
+
+      {/* Error Modal */}
+      <SuccessModal
+        visible={isErrorModalVisible}
+        onClose={() => setIsErrorModalVisible(false)}
+        title="Error"
+        message={errorMessage}
+      />
     </SafeAreaView>
   );
 };
@@ -233,6 +306,32 @@ const styles = StyleSheet.create({
   addButton: {
     width: "100%",
     marginTop: 10
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)"
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+    alignItems: "center"
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginVertical: 10
+  },
+  input: {
+    width: "100%",
+    marginVertical: 10
+  },
+  closeButton: {
+    marginTop: 10,
+    backgroundColor: "#ABABAB"
   }
 });
 

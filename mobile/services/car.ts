@@ -37,7 +37,7 @@ interface ApiResponse {
   error: string;
 }
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL 
+const API_URL = process.env.EXPO_PUBLIC_API_URL; // Fallback for local development
 
 export const getAllCars = async (): Promise<Car[]> => {
   try {
@@ -93,9 +93,59 @@ export const getCarById = async (id: string): Promise<Car> => {
   }
 };
 
-export const addCar = async (carData: Omit<Car, '_id' | 'createdAt' | 'updatedAt'>): Promise<Car> => {
+interface AddCarData {
+  seller_id: string;
+  buyer_id?: string;
+  make: string;
+  model: string;
+  year: number;
+  price: number;
+  mileage: number;
+  engine_type: string;
+  fuel_efficiency: number;
+  transmission_type: string;
+  fuel_type: string;
+  has_never_been_in_accident: boolean;
+  insurance_number: string;
+  car_number: string;
+  description: string;
+  image_urls: string[];
+  is_sold: boolean;
+  status: string;
+  car_type: string;
+}
+
+export const addCar = async (carData: AddCarData): Promise<Car> => {
   try {
     const response = await axios.post<Car>(`${API_URL}/cars`, carData);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    const axiosError = error as AxiosError<ApiResponse>;
+    if (axiosError.response) {
+      throw new Error(
+        JSON.stringify({
+          statusCode: axiosError.response.status,
+          message: axiosError.response.data.message || ["An unexpected error occurred"],
+          error: axiosError.response.data.error || "Bad Request"
+        })
+      );
+    } else {
+      throw new Error(
+        JSON.stringify({
+          statusCode: 500,
+          message: ["Network Error or Internal Server Error"],
+          error: "Server Error"
+        })
+      );
+    }
+  }
+};
+
+
+export const getCarsBySellerId = async (sellerId: string): Promise<Car[]> => {
+  try {
+    const response = await axios.get<Car[]>(`${API_URL}/cars/seller/${sellerId}`);
     return response.data;
   } catch (error) {
     console.log(error);

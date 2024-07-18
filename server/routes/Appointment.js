@@ -32,7 +32,7 @@ const router = express.Router();
  *               appointment_date:
  *                 type: string
  *                 format: date
- *               appointment_time:
+ *               description:
  *                 type: string
  *               status:
  *                 type: string

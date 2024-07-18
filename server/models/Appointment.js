@@ -20,13 +20,13 @@ const appointmentSchema = new mongoose.Schema({
         type: Date,
         required: true,
     },
-    appointment_time: {
+    description: {
         type: String,
         required: true,
     },
     status: {
         type: String,
-        enum: ['scheduled', 'completed', 'sold',  'cancelled'],
+        enum: ['scheduled', 'completed', 'sold', 'cancelled'],
         required: true,
     }
 }, { timestamps: true });
