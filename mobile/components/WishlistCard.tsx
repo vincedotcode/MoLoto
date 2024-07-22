@@ -29,7 +29,7 @@ const WishlistCard: React.FC<WishlistCardProps> = ({ item, onRemove }) => {
       </CardHeader>
       <CardContent>
         <Text>Year: {item.car_id.year}</Text>
-        <Text>Price: ${item.car_id.price}</Text>
+        <Text>Price: Rs{item.car_id.price}</Text>
       </CardContent>
       <CardFooter>
         <Button onPress={handleRemove}>Remove</Button>
