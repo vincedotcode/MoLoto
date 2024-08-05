@@ -99,7 +99,140 @@ const AddCar: React.FC<AddCarProps> = ({ onAddCarSuccess }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-     
+      <Card>
+        <CardHeader>
+          <CardTitle>Add Car</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Input
+            placeholder="Make"
+            value={car.make}
+            onChangeText={(text) => handleInputChange('make', text)}
+          />
+          <Input
+            placeholder="Model"
+            value={car.model}
+            onChangeText={(text) => handleInputChange('model', text)}
+          />
+          <Input
+            placeholder="Year"
+            value={car.year}
+            onChangeText={(text) => handleInputChange('year', text)}
+            keyboardType="numeric"
+          />
+          <Input
+            placeholder="Price"
+            value={car.price}
+            onChangeText={(text) => handleInputChange('price', text)}
+            keyboardType="numeric"
+          />
+          <Input
+            placeholder="Mileage"
+            value={car.mileage}
+            onChangeText={(text) => handleInputChange('mileage', text)}
+            keyboardType="numeric"
+          />
+          <Input
+            placeholder="Engine Type"
+            value={car.engine_type}
+            onChangeText={(text) => handleInputChange('engine_type', text)}
+          />
+          <Input
+            placeholder="Fuel Efficiency"
+            value={car.fuel_efficiency}
+            onChangeText={(text) => handleInputChange('fuel_efficiency', text)}
+            keyboardType="numeric"
+          />
+          <View style={styles.pickerContainer}>
+            <RNPickerSelect
+              onValueChange={(value) => handleInputChange('transmission_type', value)}
+              items={[
+                { label: 'Automatic', value: 'automatic' },
+                { label: 'Manual', value: 'manual' },
+                { label: 'Semi-Automatic', value: 'semi-automatic' },
+              ]}
+              style={pickerSelectStyles}
+              placeholder={{ label: 'Select Transmission Type', value: null }}
+              value={car.transmission_type}
+            />
+          </View>
+          <View style={styles.pickerContainer}>
+            <RNPickerSelect
+              onValueChange={(value) => handleInputChange('fuel_type', value)}
+              items={[
+                { label: 'Petrol', value: 'petrol' },
+                { label: 'Diesel', value: 'diesel' },
+                { label: 'Electric', value: 'electric' },
+                { label: 'Hybrid', value: 'hybrid' },
+              ]}
+              style={pickerSelectStyles}
+              placeholder={{ label: 'Select Fuel Type', value: null }}
+              value={car.fuel_type}
+            />
+          </View>
+          <Input
+            placeholder="Insurance Number"
+            value={car.insurance_number}
+            onChangeText={(text) => handleInputChange('insurance_number', text)}
+          />
+          <Input
+            placeholder="Car Number"
+            value={car.car_number}
+            onChangeText={(text) => handleInputChange('car_number', text)}
+          />
+          <Input
+            placeholder="Description"
+            value={car.description}
+            onChangeText={(text) => handleInputChange('description', text)}
+          />
+          <View style={styles.pickerContainer}>
+            <RNPickerSelect
+              onValueChange={(value) => handleInputChange('car_type', value)}
+              items={[
+                { label: 'Sedan', value: 'sedan' },
+                { label: 'Hatchback', value: 'hatchback' },
+                { label: 'SUV', value: 'SUV' },
+                { label: 'Coupé', value: 'coupé' },
+                { label: 'Convertible', value: 'convertible' },
+                { label: 'Wagon', value: 'wagon' },
+                { label: 'Pickup', value: 'pickup' },
+                { label: 'Minivan', value: 'minivan' },
+                { label: 'Sports Car', value: 'sports car' },
+                { label: 'Electric', value: 'electric' },
+                { label: 'Hybrid', value: 'hybrid' },
+                { label: 'Luxury', value: 'luxury' },
+                { label: 'Off-Road', value: 'off-road' },
+                { label: 'Other', value: 'other' },
+              ]}
+              style={pickerSelectStyles}
+              placeholder={{ label: 'Select Car Type', value: null }}
+              value={car.car_type}
+            />
+          </View>
+
+          <View style={styles.imageInputContainer}>
+            <TextInput
+              style={styles.imageInput}
+              placeholder="Image URL"
+              value={imageUrl}
+              onChangeText={setImageUrl}
+            />
+            <Button onPress={handleImagesChange}>Add Image</Button>
+          </View>
+          {car.image_urls.map((url, index) => (
+            <View key={index} style={styles.imageUrlContainer}>
+              <Text style={styles.imageUrl}>{url}</Text>
+              <TouchableOpacity onPress={() => handleRemoveImage(index)}>
+                <AntDesign name="delete" size={24} color="black" />
+              </TouchableOpacity>
+            </View>
+          ))}
+
+          <Button onPress={handleAddCar} disabled={loading}>
+            {loading ? 'Adding...' : 'Add Car'}
+          </Button>
+        </CardContent>
+      </Card>
     </ScrollView>
   );
 };
