@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, StyleSheet, View, Alert, TextInput, Text, TouchableOpacity } from 'react-native';
+import { ScrollView, StyleSheet, View, Alert, TextInput, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
@@ -36,9 +36,18 @@ interface AddCarProps {
 
 const AddCar: React.FC<AddCarProps> = ({ onAddCarSuccess }) => {
   const { user } = useAuth();
+  const [loadingUser, setLoadingUser] = useState(true);
+  const id = user?._id;
+
+  useEffect(() => {
+    if (user) {
+      console.log(id);
+      setLoadingUser(false);
+    }
+  }, [user]);
 
   const [car, setCar] = useState<AddCarData>({
-    seller_id: user?._id || '', // Initialize with an empty string if user is null
+    seller_id: id || '', // Initialize with an empty string if user is null
     make: '',
     model: '',
     year: '',
@@ -60,13 +69,13 @@ const AddCar: React.FC<AddCarProps> = ({ onAddCarSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
 
-
   const handleInputChange = (name: string, value: any) => {
     setCar({ ...car, [name]: value });
   };
 
   const handleAddCar = async () => {
     setLoading(true);
+
     try {
       await addCar({
         ...car,
@@ -74,6 +83,7 @@ const AddCar: React.FC<AddCarProps> = ({ onAddCarSuccess }) => {
         price: Number(car.price),
         mileage: Number(car.mileage),
         fuel_efficiency: Number(car.fuel_efficiency),
+        seller_id: id || '', // Initialize with an empty string if user is null
       });
       onAddCarSuccess(); // Call success handler
     } catch (error) {
@@ -96,6 +106,14 @@ const AddCar: React.FC<AddCarProps> = ({ onAddCarSuccess }) => {
     const updatedImages = car.image_urls.filter((_, i) => i !== index);
     setCar({ ...car, image_urls: updatedImages });
   };
+
+  if (loadingUser) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -271,6 +289,11 @@ const styles = StyleSheet.create({
   },
   imageUrl: {
     color: '#000',
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
